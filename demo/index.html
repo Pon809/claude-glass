@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Claude Glass demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --ink:#1b1b1f; --mute:#6b6b74; --line:#e3e3e8; --bg:#f7f7f9; --accent:#2b6cb0; }
+  body { margin:0; font: 16px/1.5 Georgia, serif; color:var(--ink); background:var(--bg); }
+  main { max-width:560px; margin:48px auto; padding:0 20px; }
+  h1 { font-size:22px; font-weight:normal; margin:0 0 20px; letter-spacing:.02em; }
+  nav { display:flex; gap:4px; border-bottom:1px solid var(--line); margin-bottom:20px; }
+  nav button { background:none; border:0; padding:8px 14px; font:inherit; color:var(--mute); cursor:pointer; border-bottom:2px solid transparent; }
+  nav button[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--accent); }
+  ul { list-style:none; padding:0; margin:0; }
+  li { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); }
+  li.done span { text-decoration:line-through; color:var(--mute); }
+  li button, form button, [data-action="clear"] { font:inherit; font-size:14px; padding:4px 10px; border:1px solid var(--line); background:#fff; border-radius:4px; cursor:pointer; }
+  form { display:flex; gap:8px; margin-top:16px; }
+  input { flex:1; font:inherit; padding:6px 10px; border:1px solid var(--line); border-radius:4px; }
+  .empty { color:var(--mute); padding:10px 0; }
+</style>
+</head>
+<body>
+<main data-app-root>
+  <h1>Claude Glass demo</h1>
+  <nav role="tablist" aria-label="Views">
+    <button role="tab" data-tab="list" aria-selected="true">Tasks</button>
+    <button role="tab" data-tab="done" aria-selected="false">Done</button>
+    <button role="tab" data-tab="settings" aria-selected="false">Settings</button>
+  </nav>
+
+  <section data-view="list">
+    <ul data-list="open"></ul>
+    <form data-form="new-task">
+      <input data-field="new-task" placeholder="New task" aria-label="New task">
+      <button type="submit">Add</button>
+    </form>
+  </section>
+
+  <section data-view="done" hidden>
+    <ul data-list="done"></ul>
+  </section>
+
+  <section data-view="settings" hidden>
+    <button data-action="clear">Clear all tasks</button>
+  </section>
+</main>
+
+<script>
+  const state = {
+    tasks: [
+      { id: 1, text: 'Write the feature map', status: 'open' },
+      { id: 2, text: 'Plant a bug in the demo', status: 'open' },
+      { id: 3, text: 'Record the video', status: 'open' },
+    ],
+  };
+
+  const root = document.querySelector('[data-app-root]');
+  const tabs = root.querySelectorAll('[role="tab"]');
+  const views = root.querySelectorAll('[data-view]');
+
+  function showTab(name) {
+    tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+    views.forEach(v => v.hidden = v.dataset.view !== name);
+  }
+
+  function render() {
+    const open = root.querySelector('[data-list="open"]');
+    const done = root.querySelector('[data-list="done"]');
+    open.innerHTML = '';
+    done.innerHTML = '';
+    for (const t of state.tasks) {
+      const li = document.createElement('li');
+      li.dataset.taskId = t.id;
+      li.className = t.status;
+      const span = document.createElement('span');
+      span.textContent = t.text;
+      li.appendChild(span);
+      if (t.status === 'open') {
+        const b = document.createElement('button');
+        b.dataset.action = 'done';
+        b.textContent = 'Mark done';
+        li.appendChild(b);
+        open.appendChild(li);
+      } else {
+        done.appendChild(li);
+      }
+    }
+    if (!open.children.length) open.innerHTML = '<li class="empty">Nothing open.</li>';
+    if (!done.children.length) done.innerHTML = '<li class="empty">Nothing done yet.</li>';
+  }
+
+  root.addEventListener('click', e => {
+    const tab = e.target.closest('[role="tab"]');
+    if (tab) return showTab(tab.dataset.tab);
+
+    if (e.target.matches('[data-action="done"]')) {
+      const id = Number(e.target.closest('li').dataset.taskId);
+      const task = state.tasks.find(t => t.id === id);
+      // BUG (intentional, for the demo): the status is written to a copy, not to state.
+      const updated = { ...task, status: 'done' };
+      render();
+      return;
+    }
+
+    if (e.target.matches('[data-action="clear"]')) {
+      state.tasks = [];
+      render();
+      showTab('list');
+    }
+  });
+
+  root.querySelector('[data-form="new-task"]').addEventListener('submit', e => {
+    e.preventDefault();
+    const input = e.target.querySelector('[data-field="new-task"]');
+    const text = input.value.trim();
+    if (!text) return;
+    state.tasks.push({ id: Date.now(), text, status: 'open' });
+    input.value = '';
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
