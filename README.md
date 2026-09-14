@@ -1,6 +1,6 @@
 # Claude Glass
 
-The `control-ui` skill from Cursor's team kit (by Lauren Tan, @poteto), packaged for Claude Code,
+The `control-ui` skill from Cursor's team kit, packaged for Claude Code,
 plus the piece the upstream repo does not ship: a **feature map** template.
 
 The agent opens your app, performs one action at a time, takes a screenshot before and after,
@@ -51,5 +51,6 @@ The skill does not include one; you write it per project.
 
 ## Attribution
 
-`control-ui` is MIT, Copyright (c) Lauren Tan / Cursor. See `NOTICE.md` to re-sync with upstream.
+`control-ui` is MIT, part of Cursor's `cursor-team-kit` plugin. See `NOTICE.md` for what the
+commit history does and does not support about who wrote it, and how to re-sync with upstream.
 Everything else is MIT, see `LICENSE`.
