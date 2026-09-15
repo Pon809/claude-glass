@@ -98,8 +98,7 @@
     if (e.target.matches('[data-action="done"]')) {
       const id = Number(e.target.closest('li').dataset.taskId);
       const task = state.tasks.find(t => t.id === id);
-      // BUG (intentional, for the demo): the status is written to a copy, not to state.
-      const updated = { ...task, status: 'done' };
+      task.status = 'done';
       render();
       return;
     }
