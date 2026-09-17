@@ -1,6 +1,7 @@
 # Claude Glass
 
 [![Watch the video](https://img.shields.io/badge/YouTube-Watch%20the%20video-red)](https://www.youtube.com/watch?v=EF2Xx5ZWfaI)
+[![Real bug it caught](https://img.shields.io/badge/YouTube-The%20bug%20it%20caught-red)](https://youtu.be/1AJuiKO3zkw)
 
 The `control-ui` skill from Cursor's team kit, packaged for Claude Code,
 plus the piece the upstream repo does not ship: a **feature map** template.
